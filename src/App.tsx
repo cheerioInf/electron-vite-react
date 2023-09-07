@@ -1,40 +1,49 @@
-import { useState } from 'react'
-import Update from '@/components/update'
-import logoVite from './assets/logo-vite.svg'
-import logoElectron from './assets/logo-electron.svg'
-import './App.scss'
+import { useState } from "react";
+import Update from "@/components/update";
+import logoVite from "./assets/logo-vite.svg";
+import logoElectron from "./assets/logo-electron.svg";
+import "./App.scss";
+import { InboxOutlined } from "@ant-design/icons";
+import type { UploadProps } from "antd";
+import { message, Upload } from "antd";
 
-console.log('[App.tsx]', `Hello world from Electron ${process.versions.electron}!`)
+const { Dragger } = Upload;
 
 function App() {
-  const [count, setCount] = useState(0)
-  return (
-    <div className='App'>
-      <div className='logo-box'>
-        <a href='https://github.com/electron-vite/electron-vite-react' target='_blank'>
-          <img src={logoVite} className='logo vite' alt='Electron + Vite logo' />
-          <img src={logoElectron} className='logo electron' alt='Electron + Vite logo' />
-        </a>
-      </div>
-      <h1>Electron + Vite + React</h1>
-      <div className='card'>
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className='read-the-docs'>
-        Click on the Electron + Vite logo to learn more
-      </p>
-      <div className='flex-center'>
-        Place static files into the<code>/public</code> folder <img style={{ width: '5em' }} src='./node.svg' alt='Node logo' />
-      </div>
+  const [count, setCount] = useState(0);
 
-      <Update />
+  const props: UploadProps = {
+    name: "file",
+    multiple: true,
+    customRequest: (options) => {
+      const { onSuccess, onError, file } = options;
+      console.log(file);
+      onSuccess!("done");
+    },
+    onChange(info) {
+      const { status } = info.file;
+      if (status !== "uploading") {
+        console.log(info.file, info.fileList);
+      }
+      if (status === "done") {
+        message.success(`${info.file.name} 上传成功`);
+      } else if (status === "error") {
+        message.error(`${info.file.name} 上传失败`);
+      }
+    },
+  };
+
+  return (
+    <div className="App">
+      <Dragger {...props}>
+        <p className="ant-upload-drag-icon">
+          <InboxOutlined />
+        </p>
+        <p className="ant-upload-text">点击或者拖动上传 .xlsx 文件</p>
+        <p className="ant-upload-hint">支持单个或多个 .xlsx 文件上传</p>
+      </Dragger>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
